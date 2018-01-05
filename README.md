@@ -1,25 +1,18 @@
-# Spectre Attack Example
-Example of using revealed "Spectre" exploit from 2 Jan 2018 (CVE-2017-5753 and CVE-2017-5715)
+# Spectre 攻击例程 #
 
-Spectre breaks the isolation between different applications. It allows an attacker to trick error-free programs, which follow best practices, into leaking their secrets. In fact, the safety checks of said best practices actually increase the attack surface and may make applications more susceptible to Spectre.
+2018年1月2日 (CVE-2017-5753 和 CVE-2017-5715)  "幽灵" Spectre 漏洞利用例子 
 
-* [Spectre paper] - Spectre paper and source of code
 
-## Language
-C, uses libs:
-* stdio.h
-* stdlib.h
-* stdint.h
-* intrin.h - for rdtscp and clflush
+## 这是什么？ ##
 
-## What's example do?
-We're putting text "The Magic Words are Squeamish Ossifrage." in memory and then we're trying to read it using exploit. If system is vulnerable, you'll see same text in output, readed from memory.
-***
-In this code, if the compiled instructions in `victim_function()` were executed in strict program order, the function would only read from `array1[0..15]` since array1 size = 16. 
-However, when executed speculatively, out-of-bounds reads are possible. The read memory `byte()` function makes several training calls to `victim_function()` to make the branch predictor expect valid values for x, then calls with an out-of-bounds x. The conditional branch mispredicts, and the ensuing speculative execution reads a secret byte using the out-of-bounds x. The speculative code then reads from `array2[array1[x] * 512]`, leaking the value of `array1[x]` into the cache state. To complete the attack, a simple flush+probe is used to identify which cache line in `array2` was loaded, reveaing the memory contents. The attack is repeated several times, so even if the target byte was initially uncached, the first iteration will bring it into the cache. 
-The unoptimized code reads approximately 10KB/second on an i7 Surface Pro 3.
+我们把文本 "The Magic Words are Squeamish Ossifrage." 放在内存中, 然后我们试图利用漏洞读取他。如果系统易受到攻击, 那么你将在标准输出中看到相同的文本。
 
-## Sources
+
+在本代码中, 如果 victim_function () 中的编译指令以严格的程序顺序执行, 则该函数只从 array1 [0.. 15] 中读取, 因为 array1 size = 16。但是, 执行时间超出读取时间是可能的。读取内存 byte() 函数对 victim_function () 进行多次训练调用, 以使分支预测器预期 x 的有效值, 然后调用界外的 x。条件分支无法预测, 随后的推测执行使用界外 x 读取一个谜之字节。然后, 预测代码从 array2 [array1 [x] * 512] 中读取, 将 array1 [x] 的值泄漏到缓存。为了完成攻击, 使用一个简单的刷新 + 探头来识别 array2 在哪个缓存行, 透露内存内容。攻击重复多次, 因此即使目标字节最初未被缓存, 第一次迭代也会将其带入缓存。在i7 surface Pro 3中，优化的代码读取速度大约 10 kb/秒 。
+
+
+## 来源 ##
+
 * [Spectre exploits info]
 * [CVE-2017-5753] - Variant 1: bounds check bypass
 * [CVE-2017-5715] - Variant 2: branch target injection
